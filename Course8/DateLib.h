@@ -100,6 +100,78 @@ namespace DateLib
 		return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
 	}
 
+	short GetCountDaysFromBeginYearToEnteredDate(short year, short month, short day)
+	{
+		short totalDays = 0;
+
+		for (short i = 1; i <= month - 1; i++)
+			totalDays += GetDaysNumberInMonth(year, i);
+
+		return totalDays + day;
+	}
+
+	stDate DateAddDays(short days, stDate date)
+	{
+		short totalDays = days + GetCountDaysFromBeginYearToEnteredDate(date.Year, date.Month, date.Day);
+		short daysInMonth;
+		date.Month = 1;
+
+		while (true)
+		{
+			daysInMonth = GetDaysNumberInMonth(date.Year, date.Month);
+
+			if (daysInMonth < totalDays)
+			{
+				totalDays -= daysInMonth;
+				date.Month++;
+
+				if (date.Month > 12)
+					date.Month = 1;
+			}
+			else
+			{
+				date.Day = totalDays;
+				break;
+			}
+
+		}
+
+		return date;
+	}
+
+	void SwapDate(stDate& date1, stDate& date2)
+	{
+		stDate temp;
+		temp = date1;
+		date1 = date2;
+		date2 = temp;
+	}
+
+	stDate GetDateNow()
+	{
+		stDate date;
+		time_t t = time(0);
+
+		tm* now = localtime(&t);
+
+		date.Day = now->tm_mday;
+		date.Month = now->tm_mon + 1;
+		date.Year = now->tm_year + 1900;
+
+		return date;
+	}
+
+	short GetDayInCurrentMonth(stDate date)
+	{
+		short countDaysInMonth = GetDaysNumberInMonth(date.Year, date.Month);
+		if (countDaysInMonth < date.Day)
+			return countDaysInMonth;
+			
+		return date.Day;
+	}
+
+#pragma region FunctionIncreaseDate
+
 	stDate IncreaseDateByOneDay(stDate date)
 	{
 		if (IsLastDayInMonth(date))
@@ -132,12 +204,7 @@ namespace DateLib
 
 	stDate IncreaseDateByOneWeek(stDate date)
 	{
-		for (short i = 0; i < 7; i++)
-		{
-			date = IncreaseDateByOneDay(date);
-
-		}
-		return date;
+		return IncreaseDateByXDays(date,7);
 	}
 
 	stDate IncreaseDateByXWeeks(stDate date, short weeks)
@@ -161,9 +228,8 @@ namespace DateLib
 		else
 			date.Month++;
 
-		short countDaysInMonth = GetDaysNumberInMonth(date.Year,date.Month);
-		if (countDaysInMonth < date.Day)
-			date.Day = countDaysInMonth;
+		date.Day = GetDayInCurrentMonth(date);
+
 
 		return date;
 	}
@@ -182,6 +248,8 @@ namespace DateLib
 	{
 		date.Year++;
 
+		date.Day = GetDayInCurrentMonth(date);
+
 		return date;
 	}
 
@@ -197,6 +265,9 @@ namespace DateLib
 	stDate IncreaseDateByXYearsFaster(stDate date, short years)
 	{
 		date.Year += years;
+		
+		date.Day = GetDayInCurrentMonth(date);
+
 		return date;
 	}
 
@@ -204,22 +275,21 @@ namespace DateLib
 	{
 		date.Year += 10;
 
+		date.Day = GetDayInCurrentMonth(date);
+
 		return date;
 	}
 
 	stDate IncreaseDateByXDecades(stDate date, short decades)
 	{
-		for (short i = 0; i < decades; i++)
-		{
-			date = IncreaseDateByOneDecade(date);
-		}
-
-		return date;
+		return IncreaseDateByXYearsFaster(date, decades * 10);
 	}
 
 	stDate IncreaseDateByXDecadesFaster(stDate date, short decades)
 	{
 		date.Year += (10 * decades);
+
+		date.Day = GetDayInCurrentMonth(date);
 
 		return date;
 	}
@@ -227,92 +297,176 @@ namespace DateLib
 	stDate IncreaseDateByOneCentury(stDate date)
 	{
 		date.Year += 100;
+		
+		date.Day = GetDayInCurrentMonth(date);
+
 		return date;
 	}
 
 	stDate IncreaseDateByOneMillennium(stDate date)
 	{
 		date.Year += 1000;
+
+		date.Day = GetDayInCurrentMonth(date);
+
 		return date;
 	}
 
-	short GetCountDaysFromBeginYearToEnteredDate(short year, short month,short day)
-	{
-		short totalDays = 0;
+#pragma endregion
 
-		for (short i = 1; i <= month-1; i++)
-			totalDays += GetDaysNumberInMonth(year, i);
-	
-		return totalDays + day;
+#pragma region FunctionDecreaseDate
+
+	stDate DecreaseDateByOneDay(stDate date)
+	{
+		if (--date.Day == 0)
+		{
+			if (--date.Month == 0) 
+			{
+				date.Month = 12;
+				date.Year--;
+			}
+			date.Day = GetDaysNumberInMonth(date.Year, date.Month);
+		}
+		
+		return date;
 	}
 
-	stDate DateAddDays(short days,stDate date) 
+	stDate DecreaseDateByXDays(stDate date, short days)
 	{
-		short totalDays = days + GetCountDaysFromBeginYearToEnteredDate(date.Year, date.Month, date.Day);
-		short daysInMonth;
-		date.Month = 1;
-
-		while (true)
+		for (short i = 0; i < days; i++)
 		{
-			 daysInMonth = GetDaysNumberInMonth(date.Year, date.Month);
-
-			if (daysInMonth < totalDays)
-			{
-				totalDays -= daysInMonth;
-				date.Month++;
-
-				if (date.Month > 12)
-					date.Month = 1;
-			}
-			else 
-			{
-				date.Day = totalDays;
-				break;
-			}
-
+			date = DecreaseDateByOneDay(date);
 		}
 
 		return date;
 	}
 
-	void SwapDate(stDate& date1, stDate& date2)
+	stDate DecreaseDateByOneWeek(stDate date)
 	{
-		stDate temp;
-		temp = date1;
-		date1 = date2;
-		date2 = temp;
+		return DecreaseDateByXDays(date,7);
 	}
+
+	stDate DecreaseDateByXWeeks(stDate date, short weeks)
+	{
+		for (short i = 0; i < weeks; i++)
+		{
+			date = DecreaseDateByOneWeek(date);
+		}
+
+		return date;
+	}
+
+	stDate DecreaseDateByOneMonth(stDate date)
+	{
+		if ( --date.Month == 0)
+		{
+			date.Month=1;
+			date.Year--;
+		}
 	
-	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay = false) 
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByXMonths(stDate date, short months)
+	{
+		for (short i = 0; i < months; i++)
+		{
+			date = DecreaseDateByOneMonth(date);
+		}
+
+		return date;
+	}
+
+	stDate DecreaseDateByOneYear(stDate date)
+	{
+		date.Year--;
+
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByXYears(stDate date, short years)
+	{
+		for (short i = 0; i < years; i++)
+		{
+			date = DecreaseDateByOneYear(date);
+		}	
+		
+		return date;
+	}
+
+	stDate DecreaseDateByXYearsFaster(stDate date, short years)
+	{
+		date.Year -= years;
+
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByOneDecade(stDate date)
+	{
+		date.Year -= 10;
+
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByXDecades(stDate date, short decades)
+	{
+		return DecreaseDateByXYearsFaster(date, decades * 10);
+	}
+
+	stDate DecreaseDateByXDecadesFaster(stDate date, short decades)
+	{
+		date.Year -= (10 * decades);
+
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByOneCentury(stDate date)
+	{
+		date.Year -= 100;
+
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+	stDate DecreaseDateByOneMillennium(stDate date)
+	{
+		date.Year -= 1000;
+		
+		date.Day = GetDayInCurrentMonth(date);
+
+		return date;
+	}
+
+#pragma endregion
+
+	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay = false)
 	{
 		short days = 0;
 		short swapFlagValue = 1;
-	
-		if (!IsDate1BeforeDate2(date1, date2)) 
+
+		if (!IsDate1BeforeDate2(date1, date2))
 		{
 			swapFlagValue = -1;
 			SwapDate(date1, date2);
 		}
-	
-		while (!IsDate1EqualDate2(date1,date2))
+
+		while (!IsDate1EqualDate2(date1, date2))
 		{
 			date1 = IncreaseDateByOneDay(date1);
 			days++;
 		}
-		return  (includingEndDay ? ++days : days) *swapFlagValue;
+		return  (includingEndDay ? ++days : days) * swapFlagValue;
 	}
 
-	stDate GetDateNow()
-	{
-		stDate date;
-		time_t t = time(0);
-	
-		tm* now = localtime(&t);
-		
-		date.Day = now->tm_mday;
-		date.Month = now->tm_mon + 1;
-		date.Year = now->tm_year + 1900;
-	
-		return date;
-	}
 }
