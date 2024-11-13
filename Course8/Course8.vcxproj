@@ -146,6 +146,10 @@
     <ClCompile Include="Problem #17.cpp" />
     <ClCompile Include="Problem #18.cpp" />
     <ClCompile Include="Problem #19.cpp" />
+    <ClCompile Include="Problem #20 to #32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DateLib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
