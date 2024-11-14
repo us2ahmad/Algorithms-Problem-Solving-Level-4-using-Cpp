@@ -149,6 +149,8 @@
     <ClCompile Include="Problem #20 to #32.cpp" />
     <ClCompile Include="Problem #33 to #46.cpp" />
     <ClCompile Include="Problem #47 to #53.cpp" />
+    <ClCompile Include="Problem #54.cpp" />
+    <ClCompile Include="Problem #55.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateLib.h" />

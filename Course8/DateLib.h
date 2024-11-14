@@ -526,4 +526,34 @@ namespace DateLib
 		return  (includingEndDay ? ++days : days) * swapFlagValue;
 	}
 
+	short CalculateVacationDays(stDate fromDate, stDate toDate)
+	{
+
+		short daysCount = 0;
+
+		while (IsDate1BeforeDate2(fromDate, toDate))
+		{
+			if (IsBusinessDay(fromDate))
+				daysCount++;
+
+			fromDate = IncreaseDateByOneDay(fromDate);
+		}
+		return daysCount;
+
+	}
+
+	stDate CalculateVacationReturnDate(stDate fromDate, short daysCount)
+	{
+		short i = 0;
+
+		while (i < daysCount)
+		{
+			if (IsBusinessDay(fromDate))
+				i++;
+
+			fromDate = IncreaseDateByOneDay(fromDate);
+		}
+
+		return fromDate;
+	}
 }
