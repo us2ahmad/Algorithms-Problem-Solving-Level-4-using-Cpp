@@ -6,8 +6,10 @@
 
 using namespace std;
 
-namespace DateLib 
+namespace DateLib
 {
+	enum enDayOfWeek { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
+	
 	struct stDate
 	{
 		short Year;
@@ -15,6 +17,8 @@ namespace DateLib
 		short Day;
 	};
 
+	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay = false);//Declaration Function
+	
 	short ReadNumber(const string& message)
 	{
 		printf(message.c_str());
@@ -35,27 +39,27 @@ namespace DateLib
 
 		return date;
 	}
-	
+
 	bool IsLeapYear(short year)
 	{
 		return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
 	}
 
-	int GetDaysFromYear(short year) 
+	int GetDaysFromYear(short year)
 	{
 		return IsLeapYear(year) ? 366 : 365 ;
 	}
-	
-	int GetHoursFromYear(short year) 
+
+	int GetHoursFromYear(short year)
 	{
 		return GetDaysFromYear(year) * 24;
 	}
-	
+
 	int GetMinutesFromYear(short year)
 	{
 		return GetHoursFromYear(year) * 60;
 	}
-	
+
 	int GetSecondsFromYear(int minutes)
 	{
 		return GetMinutesFromYear(minutes) * 60;
@@ -86,18 +90,15 @@ namespace DateLib
 		return date2.Year == date1.Year && date2.Month == date1.Month && date2.Day == date1.Day;
 	}
 
-	bool IsDate1BeforeDate2(stDate date1,stDate date2)
+	bool IsDate1BeforeDate2(stDate date1, stDate date2)
 	{
-		return date2.Year > date1.Year ? true : (date2.Year == date1.Year ? date2.Month > date1.Month ? true : ( date2.Month == date1.Month ? date2.Day > date1.Day : false ): false);
+		return date2.Year > date1.Year ? true : (date2.Year == date1.Year ? date2.Month > date1.Month ? true : (date2.Month == date1.Month ? date2.Day > date1.Day : false) : false);
 	}
 
-	short GetDayOrder(short year,short month,short day = 1)
+	string GetDayName(short day) 
 	{
-		short a = (14 - month) / 12;
-		short y = year - a;
-		short m = month + (12 * a) - 2;
-	
-		return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
+		string arrayDays[]{"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+		return arrayDays[day];
 	}
 
 	short GetCountDaysFromBeginYearToEnteredDate(short year, short month, short day)
@@ -108,6 +109,63 @@ namespace DateLib
 			totalDays += GetDaysNumberInMonth(year, i);
 
 		return totalDays + day;
+	}
+
+	short GetCountDaysFromBeginYearToEnteredDate(stDate date)
+	{
+		return GetCountDaysFromBeginYearToEnteredDate(date.Year, date.Month, date.Day);
+	}
+	
+	short GetDayOfWeekOrder(short year, short month, short day = 1)
+	{
+		short a = (14 - month) / 12;
+		short y = year - a;
+		short m = month + (12 * a) - 2;
+
+		return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
+	}
+
+	short GetDayOfWeekOrder(stDate date)
+	{
+		return GetDayOfWeekOrder(date.Year,date.Month,date.Day);
+	}
+
+	bool IsEndOfWeek(stDate date)
+	{
+		return GetDayOfWeekOrder(date) == enDayOfWeek::Saturday;
+	}
+
+	bool IsWeekEnd(stDate date)
+	{
+		return  GetDayOfWeekOrder(date) == enDayOfWeek::Friday;
+	}
+
+	bool IsBusinessDay(stDate date) 
+	{
+		return !IsWeekEnd(date);
+	}
+
+	short DaysUntilTheEndOfWeek(stDate date)
+	{
+		return 6 - GetDayOfWeekOrder(date);
+	}
+	
+	short DaysUntilTheEndOfMonth(stDate date)
+	{
+		stDate date2 = date;
+		date2.Day = GetDaysNumberInMonth(date2.Year, date2.Month);
+
+		return GetDifferenceInDays(date,date2,true);
+	}
+	
+	short DaysUntilTheEndOfYear(stDate date)
+	{
+		stDate date2 = date;
+		
+		date2.Month = 12;
+		date2.Day = 31;
+		
+		return GetDifferenceInDays(date, date2, true);
 	}
 
 	stDate DateAddDays(short days, stDate date)
@@ -141,8 +199,7 @@ namespace DateLib
 
 	void SwapDate(stDate& date1, stDate& date2)
 	{
-		stDate temp;
-		temp = date1;
+		stDate temp = date1;
 		date1 = date2;
 		date2 = temp;
 	}
@@ -450,7 +507,7 @@ namespace DateLib
 
 #pragma endregion
 
-	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay = false)
+	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay)
 	{
 		short days = 0;
 		short swapFlagValue = 1;
