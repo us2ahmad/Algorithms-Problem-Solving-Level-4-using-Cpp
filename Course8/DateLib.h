@@ -10,11 +10,19 @@ namespace DateLib
 {
 	enum enDayOfWeek { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
 	
+	enum enComperStatus {Before = -1, Equal = 0, After = 1};
+
 	struct stDate
 	{
 		short Year;
 		short Month;
 		short Day;
+	};
+
+	struct stPeriod
+	{
+		stDate FromDate;
+		stDate ToDate;
 	};
 
 	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay = false);//Declaration Function
@@ -38,6 +46,16 @@ namespace DateLib
 		cout << endl;
 
 		return date;
+	}
+
+	stPeriod ReadFullPeriod()
+	{
+		stPeriod period;
+		cout << "\nEnter Start Date :\n\n";
+		period.FromDate = ReadFullDate();
+		cout << "\nEnter End Date :\n";
+		period.ToDate = ReadFullDate();
+		return period;
 	}
 
 	bool IsLeapYear(short year)
@@ -93,6 +111,27 @@ namespace DateLib
 	bool IsDate1BeforeDate2(stDate date1, stDate date2)
 	{
 		return date2.Year > date1.Year ? true : (date2.Year == date1.Year ? date2.Month > date1.Month ? true : (date2.Month == date1.Month ? date2.Day > date1.Day : false) : false);
+	}
+
+	bool IsDate1AfterDate2(stDate date1, stDate date2) 
+	{
+		return !IsDate1BeforeDate2(date1, date2) && !IsDate1EqualDate2(date1, date2);
+
+	}
+
+	enComperStatus GetComperDateResult(stDate date1, stDate date2)
+	{
+		if (IsDate1BeforeDate2(date1, date2))
+			return enComperStatus::Before;
+
+		if (IsDate1EqualDate2(date1, date2))
+			return enComperStatus::Equal;
+
+		/*if (IsDate1AfterDate2(date1, date2))
+			return enComperStatus::After;*/
+		
+		//This IsFaster
+		return enComperStatus::After;
 	}
 
 	string GetDayName(short day) 
@@ -507,7 +546,7 @@ namespace DateLib
 
 #pragma endregion
 
-	short GetDifferenceInDays(stDate date1, stDate date2, bool includingEndDay)
+	short GetDifferenceInDays(stDate date1, stDate date2, bool includeEndDay)
 	{
 		short days = 0;
 		short swapFlagValue = 1;
@@ -523,7 +562,12 @@ namespace DateLib
 			date1 = IncreaseDateByOneDay(date1);
 			days++;
 		}
-		return  (includingEndDay ? ++days : days) * swapFlagValue;
+		return  (includeEndDay ? ++days : days) * swapFlagValue;
+	}
+
+	short GetPeriodLengthInDays(stPeriod period, bool includeEndDay = false)
+	{
+		return GetDifferenceInDays(period.FromDate, period.ToDate, includeEndDay);
 	}
 
 	short CalculateVacationDays(stDate fromDate, stDate toDate)
@@ -556,4 +600,23 @@ namespace DateLib
 
 		return fromDate;
 	}
+
+	bool IsPeriodsOverLap(stPeriod period1, stPeriod period2)
+	{
+		//return IsDate1BeforeDate2(period1.FromDate, period2.ToDate) && IsDate1BeforeDate2(period2.FromDate, period1.ToDate); //This My Solution
+
+		if (GetComperDateResult(period2.ToDate, period1.FromDate) == enComperStatus::Before ||
+			GetComperDateResult(period2.FromDate, period1.ToDate) == enComperStatus::After)
+			return false;
+		else
+			return true;
+	}
+
+	bool IsDateInPeriod(stPeriod period, stDate date)
+	{
+		return !(GetComperDateResult(date, period.FromDate) == enComperStatus::Before ||
+			GetComperDateResult(date, period.ToDate) == enComperStatus::After);
+
+	}
+
 }
