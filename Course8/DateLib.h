@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <ctime>
+#include <string>
+#include <vector>
 
 #pragma warning(disable: 4996)
 
@@ -616,7 +618,115 @@ namespace DateLib
 	{
 		return !(GetComperDateResult(date, period.FromDate) == enComperStatus::Before ||
 			GetComperDateResult(date, period.ToDate) == enComperStatus::After);
+	}
+
+	short CountOverlapDays(stPeriod period1, stPeriod period2)
+	{
+		if (!IsPeriodsOverLap(period1, period2))
+			return 0;
+	
+		short overlapDaysCount = 0;
+
+		if (GetPeriodLengthInDays(period1) < GetPeriodLengthInDays(period2))
+		{
+			while (!IsDate1EqualDate2(period1.FromDate, period1.ToDate))
+			{
+				if (IsDateInPeriod(period2, period1.FromDate))
+					overlapDaysCount++;
+
+				period1.FromDate = IncreaseDateByOneDay(period1.FromDate);
+			}
+		}
+		else
+		{
+			while (!IsDate1EqualDate2(period2.FromDate, period2.ToDate))
+			{
+				if (IsDateInPeriod(period1, period2.FromDate))
+					overlapDaysCount++;
+
+				period2.FromDate = IncreaseDateByOneDay(period2.FromDate);
+			}
+		}
+
+		return overlapDaysCount;
+	}
+
+	bool IsValidate(stDate date)
+	{
+		if (date.Month < 1 || date.Month > 12)
+			return false;
+
+		if (GetDaysNumberInMonth(date.Year, date.Month) < date.Day || date.Day < 1)
+			return false;
+
+		return true;
+	}
+
+	string ReadStringDate()
+	{
+		cout << "Please Enter Date dd/mm/yyyy ? ";
+		string dateSting;
+		getline(cin >> ws, dateSting);
+		return dateSting;
+	}
+
+	vector<string> SplitString(string text, string delim = " ")
+	{
+		vector<string> vWords;
+		short pos = 0;
+		string sWord = "";
+
+		while ((pos = text.find(delim)) != string::npos)
+		{
+			sWord = text.substr(0, pos);
+
+			if (sWord != "")
+				vWords.push_back(sWord);
+
+			text.erase(0, pos + delim.length());
+		}
+
+		if (text != "" && !vWords.empty())
+			vWords.push_back(text);
+
+		return vWords;
+	}
+
+	stDate StringToDate(string dateString)
+	{
+		vector<string> vDate = SplitString(dateString, "/");
+
+		stDate date;
+		date.Day = stoi(vDate[0]);
+		date.Month = stoi(vDate[1]);
+		date.Year = stoi(vDate[2]);
+
+		return date;
+	}
+
+	string DateToString(stDate date, string delim = "/")
+	{
+		return  to_string(date.Day) + delim + to_string(date.Month) + delim + to_string(date.Year);
+	}
+
+	string ReplaceWordInString(string text, string stringToReplace, string stringReplaceTo)
+	{
+		short pos = 0;
+		while ((pos = text.find(stringToReplace)) != string::npos)
+		{
+			text = text.replace(pos, stringToReplace.length(), stringReplaceTo);
+		}
+		return text;
 
 	}
 
+	string FormateDate(stDate date, string formate = "dd/mm/yyyy")
+	{
+		string formattedDate = "";
+		formattedDate = ReplaceWordInString(formate, "dd", to_string(date.Day));
+		formattedDate = ReplaceWordInString(formattedDate, "mm", to_string(date.Month));
+		formattedDate = ReplaceWordInString(formattedDate, "yyyy", to_string(date.Year));
+
+		return formattedDate;
+	}
 }
