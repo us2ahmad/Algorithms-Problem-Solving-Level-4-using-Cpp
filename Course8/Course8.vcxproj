@@ -160,9 +160,13 @@
     <ClCompile Include="Problem #62.cpp" />
     <ClCompile Include="Problem #65.cpp" />
     <ClCompile Include="Problems #63 and #64.cpp" />
+    <ClCompile Include="Project 1 Bank Extension 2%28MySolution%29.cpp" />
+    <ClCompile Include="Project 1 Bank Extension 2%28Dr Mohammed Solution%29.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateLib.h" />
+    <ClInclude Include="Helper.h" />
+    <ClInclude Include="ManageUserLib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

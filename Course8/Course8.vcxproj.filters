@@ -114,9 +114,21 @@
     <ClCompile Include="Problem #65.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Project 1 Bank Extension 2%28MySolution%29.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project 1 Bank Extension 2%28Dr Mohammed Solution%29.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ManageUserLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
